@@ -154,9 +154,11 @@ re-aplicar → video de vuelta. MP4 corrupto → imagen, sin crash del shell.
 
 ## 5. Checklist de verificación (consolidado)
 
-Estado: **COMPLETADO** (2025-09). Plugin v0.3.0 (rama de video + ciclo).
-Repos publicados (privados, por copyright de los clips):
+Estado: **COMPLETADO y PUBLICADO** (2025-09). Plugin v0.3.0 (rama de video + ciclo).
+Repos **públicos** (sin contenido de terceros, solo loops synth originales):
 `github.com/p3lusa/edgerunners` (tema, LFS) + `github.com/p3lusa/edgerunners-wallpaper` (plugin).
+Créditos: Omarchy (base del plugin, MIT) + moewalls.com (fuente de clips para uso personal).
+Clips personales del usuario: `~/Videos/edgerunners/` (no versionados).
 
 - [x] `omarchy plugin validate plugin/` → 0
 - [x] `omarchy theme set edgerunners` aplica colores (sin `configerrors`)
@@ -172,8 +174,11 @@ Repos publicados (privados, por copyright de los clips):
 - [x] Shell sin errores en journal + `ping` ok (equivale a `omarchy debug`, inexistente en esta versión)
 - [x] Ciclo de videos: `theme bg next` avanza clip (1/9 → 9/9 → 1/9)
 - [x] Videos reales (9 loops 1440p30 H.264 sin audio, ~4% CPU) + PNG emparejados
-- [x] Fase 7: repos en GitHub (privados) + Git LFS + **install completo desde URL verificado**
+- [x] Fase 7: repos en GitHub + Git LFS + **install completo desde URL verificado**
   (`theme install <url>` con LFS + `plugin add <url> --enable` + video en vivo)
+- [x] Publicación: historial limpio sin clips de terceros, repos PÚBLICOS,
+  créditos (Omarchy, moewalls.com), clone anónimo + LFS pull verificado,
+  pitfall LFS-GC-post-force-push documentado (DEBUG-TUNING §8)
 
 ## 6. Garantías de compatibilidad
 | Comportamiento | Estado con la Ruta A |

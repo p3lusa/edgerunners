@@ -97,8 +97,31 @@
 ## 7. Regresión (probar en cada cambio)
 1. `omarchy theme set edgerunners` → video, colores OK, sin `configerrors`.
 2. `omarchy theme set <otro>` → imagen.
-3. `omarchy theme bg next` (tema sin video) → cicla imagen.
+3. `omarchy theme bg next` → cicla imagen; en tema con videos **también
+   avanza el clip** (1/N → N/N → 1/N).
 4. Lock (`omarchy system lock`) → PNG, sin video.
 5. `omarchy refresh shell` → degradación a imagen (no negro) → re-aplicar → video.
 6. MP4 corrupto → imagen, shell vivo.
-7. `omarchy debug --no-sudo --print` limpio.
+7. `omarchy debug --no-sudo --print` limpio (si existe en la versión; aquí
+   se usa `journalctl --user -t omarchy-shell | grep -E 'ERROR|FATAL'` + ping).
+
+## 8. Publicación (Git LFS, GitHub)
+- **Regla:** el repo público **no** contiene clips/frames de Edgerunners
+  (copyright CDPR/Aniplex/Trigger). Solo los loops synth originales.
+  Los clips personales viven fuera del git (no-versionados en el clone o en
+  `~/Videos/edgerunners/`).
+- **Pitfall — LFS GC tras force-push:** si reescribiste el historial
+  (`git push --force`), GitHub puede hacer GC de los objetos LFS y dejar
+  `404` en `media.githubusercontent.com` (clones nuevos → pointers rotos).
+  **Fix:** desde el repo local, `git lfs push origin <branch> --all`
+  (re-sube todos los objetos referenciados) y volver a probar con un clone
+  anónimo (sin credenciales):
+  ```bash
+  env -i HOME=/tmp/x PATH=$PATH git clone https://github.com/<user>/edgerunners.git /tmp/x
+  cd /tmp/x && git lfs install --local && git lfs pull && file videos/*.mp4
+  ```
+- **Verificación pública:** `gh repo view <repo> --json visibility -q .visibility`.
+- **Clips personales en el clone instalado:** copiar a
+  `~/.config/omarchy/themes/edgerunners/videos|backgrounds/` + nombres en
+  `.git/info/exclude` → sobreviven a `theme update` (git pull) y `theme set`
+  los incluye en el re-stage.
