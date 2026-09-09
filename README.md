@@ -137,6 +137,13 @@ Requisitos: `aether` en `PATH`, `ffmpeg`/`ffprobe`, y el plugin activo (sin él,
 el tema muestra el poster en lugar del video). Para actualizar el clip:
 sustituye el fichero en `videos/` del tema y `omarchy theme set <nombre>`.
 
+Con varios clips creados así (uno por tema), `video-next` / `video-prev` y el
+selector de vídeo (`Super+Ctrl+Space`) ciclan entre ellos — y como cada clip
+es un tema, **cada cambio de vídeo cambia también toda la paleta del sistema**
+(terminal, barra, bordes…). Los temas que crea esta herramienta se limpian
+solos cuando se abandonan (no están activos ni en la lista de ciclo), así que
+no ensucian el selector de temas.
+
 ## Cómo funciona el wallpaper de video
 - El plugin lee el **tema activo** (`~/.local/state/omarchy/current/theme`) y,
   si ese tema trae `videos/*.mp4`, reproduce el clip en bucle y mudo en la capa
