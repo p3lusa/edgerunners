@@ -136,6 +136,13 @@ video-add.sh clip.mp4     # añadir sin TUI (--strip-audio para quitar el audio)
 video-remove.sh nombre    # borrar sin TUI
 ```
 
+### Keybindings (se instalan solos al usar cualquier herramienta)
+| Tecla | Acción |
+|---|---|
+| `Super+Ctrl+Space` | Selector de wallpaper unificado (carrusel de vídeos en temas de vídeo, selector de imagen en el resto) |
+| `Super+Ctrl+Alt+Izq/Der` | Vídeo anterior / siguiente (cicla toda la librería) |
+| `Super+Ctrl+Alt+W` | Gestor de la librería (el TUI `video-manage`) en una ventana de terminal |
+
 ## Tema desde un clip (Aether)
 El plugin incluye `bin/video-theme.sh`: genera un **tema Omarchy completo** a
 partir de un clip — extrae un poster, [Aether](https://github.com/omacom/aether)
