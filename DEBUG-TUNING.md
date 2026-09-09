@@ -17,9 +17,10 @@
   - `readlink -f ~/.local/state/omarchy/current/background`
   - `omarchy theme current`
 - **Hyprland:** `hyprctl reload`, `hyprctl configerrors`, `hyprctl monitors`.
-- **Decodificación de video (GStreamer):**
-  - `gst-inspect-1.0 | egrep -i 'vulkan|h264|h265'`  (¿HW decode disponible?)
-  - `GST_DEBUG=3 gst-launch-1.0 filesrc location=<mp4> ! decodebin ! autovideosink`
+- **Decodificación de video (Qt Multimedia/FFmpeg):**
+  - Journal del shell: `journalctl --user -t omarchy-shell | grep -E 'Input #0|video ->|playing'`
+  - Decodificar un clip a mano para descartar problemas del archivo:
+    `ffplay -nodisp -loglevel warning <mp4>`
 
 ## 2. Fallo clásico: conflicto de capa (pantalla negra)
 - **Síntoma:** escritorio negro tras activar el plugin.
@@ -52,12 +53,13 @@
 | Síntoma | Causa probable | Fix |
 |---|---|---|
 | Pantalla negra | 2 clientes en capa Background | deshabilitar stock; `restart shell` |
-| Video con sonido | falta `muted: true` | `MediaPlayer.muted: true` |
+| Video con sonido | clip con pista de audio (el backend Qt/FFmpeg no expone `muted`) | re-encodar sin audio (`-an`) |
 | Video saltarín | decode SW / bitrate alto | HW decode (Vulkan) + bajar bitrate |
 | No cambia al cambiar tema | watcher/IPC sin reaccionar | forzar `restart shell`; revisar logs |
 | Se ve imagen, no video | tema sin `videos/` o MP4 inválido | añadir MP4; validar con `ffprobe` |
 | Crash del shell con MP4 raro | codec no soportado | re-encodar a H.264; fallback a imagen |
-| `bg next` no cicla en tema con video | el tema usa video, no imágenes | esperado; ciclar video = Fase 4 (opcional) |
+| Video atascado / no entra en video, pero logs limpios | `MediaPlayer` en mal estado tras ciclo rápido o re-stage | `omarchy restart shell` (fix verificado 2025-09). **Mejora futura:** watchdog en el plugin que re-arme el player sin reiniciar shell |
+| `bg next` no cicla | tema activo sin `videos/` | esperado: sin `videos/` cicla imágenes (como stock) |
 
 ## 6. Tuning
 
@@ -76,8 +78,11 @@
   ```
 
 ### 6.2 HW decode (Vulkan)
-- Verificar `vulkanh264dec` / `vulkanh265dec` presentes.
-- Confirmar que el pipeline de GStreamer los elige (`GST_DEBUG`).
+- **En este stack el backend es Qt Multimedia/FFmpeg, no GStreamer:** los
+  logs de decode (FFmpeg `Input #0...`) salen por el journal del shell, no por
+  `GST_DEBUG`.
+- Verificar aceleración Vulkan de la GPU (`vulkaninfo | grep -i device`);
+  si el CPU se va alto con el video activo, el decode va en SW.
 
 ### 6.3 Multi-monitor
 - Un `MediaPlayer` por pantalla (simple) vs uno compartido (menos CPU).
