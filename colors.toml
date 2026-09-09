@@ -1,11 +1,11 @@
-# Edgerunners — Cyberpunk 2077 (paleta inicial; ajustar en Fase identidad)
+# Video Wallpaper — paleta neón (skin por defecto; cambia los roles a tu gusto)
 # Los roles (accent/foreground/background/...) gobiernan shell, barra,
 # notificaciones, OSD y menús. Los colores 0-15 alimentan terminal/apps.
 
-accent   = "#00f0ff"   # cian neón — firma de Edgerunners
+accent   = "#00f0ff"   # cian neón — color firma de la skin
 cursor   = "#fcee0a"   # amarillo ácido
 foreground = "#e6e6f0"
-background = "#0a0a12" # casi negro, Night City
+background = "#0a0a12" # casi negro, fondo por defecto
 
 selection_foreground = "#0a0a12"
 selection_background = "#00f0ff"

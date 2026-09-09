@@ -1,21 +1,25 @@
-# Edgerunners — Tema para Omarchy
+# Video Wallpaper — Tema para Omarchy
 
-Tema **Cyberpunk 2077: Edgerunners** para [Omarchy](https://omarchy.org/) con
-**wallpaper de video en bucle de alta calidad**.
+Tema para [Omarchy](https://omarchy.org/) cuyo objetivo es **wallpaper de
+video**: reproduce en bucle y mudo **los clips que tú pongas** en `videos/`
+como fondo de escritorio, con fallback automático a imagen. La skin incluida
+por defecto es neón (cian / magenta / amarillo sobre negro).
 
 > Preview: ![preview](preview.png)
 >
-> **Estado:** v0.1.0 — tema + plugin de video (v0.3.0) verificados en máquina
-> real (Fases 0-6 del plan). Incluye 2 loops **originales** de neón generados
-> por script (H.264 1080p30, sin audio, vía Git LFS) como wallpaper de
-> arranque — los clips reales de Edgerunners **no** se distribuyen en este
-> repo (ver [Licencia y contenido de terceros](#licencia-y-contenido-de-terceros)).
+> **Estado:** v0.2.0 — tema + plugin de video (v0.3.0) verificados en máquina
+> real. Incluye 2 loops **originales** de neón (H.264, sin audio, vía Git LFS)
+> como wallpaper de arranque — **añade tus propios clips** a `videos/`
+> (ver [Vídeos](#vídeos-añade-los-tuyos)).
 
 ## Qué incluye
-- **Paleta neón** (cian / magenta / amarillo sobre negro Night City) aplicada a
-  shell, barra, notificaciones, OSD, terminal y apps.
-- **Wallpaper de video**: reproduce en bucle y mudo un clip del tema activo como
-  fondo de escritorio, con **fallback automático a imagen**.
+- **Wallpaper de video**: un clip del tema activo en bucle y mudo como fondo
+  de escritorio, con **fallback automático a imagen** (nunca pantalla negra).
+- **Ciclo de clips**: `omarchy theme bg next` avanza al siguiente clip —
+  imagen y video avanzan juntos.
+- **Skin neón** (cian / magenta / amarillo sobre negro) aplicada a shell,
+  barra, notificaciones, OSD, terminal y apps. Cámbiala a tu gusto en
+  `colors.toml`.
 - Gestión 100% con los **comandos internos de Omarchy** (instalar, actualizar,
   desinstalar).
 
@@ -24,16 +28,13 @@ El sistema de Omarchy separa **temas** y **plugins**:
 
 | Artefacto | Repo | Se instala con | Qué aporta |
 |---|---|---|---|
-| **Tema** `edgerunners` | `github.com/p3lusa/edgerunners` | `omarchy theme install` | colores, iconos, configs, `backgrounds/`, `videos/` |
-| **Plugin** `p3lu.video-background` | `github.com/p3lusa/edgerunners-wallpaper` | `omarchy plugin add` | el renderizador de video (capa de fondo) |
+| **Tema** `video-wallpaper` | `github.com/p3lusa/video-wallpaper` | `omarchy theme install` | colores, iconos, configs, `backgrounds/`, `videos/` |
+| **Plugin** `p3lu.video-background` | `github.com/p3lusa/video-background` | `omarchy plugin add` | el renderizador de video (capa de fondo) |
 
 > **¿Por qué dos repos?** `omarchy theme install` clona el repo en la raíz de
-> `themes/<nombre>/` (ficheros de tema), y `omarchy plugin add` clona el repo en
-> la raíz de `plugins/<id>/` esperando un `manifest.json` en la raíz. No pueden
-> compartir la misma raíz → son dos repos. En este proyecto local viven juntos:
-> el tema es la raíz (`~/Projects/edgerunners`) y el plugin está anidado en
-> `~/Projects/edgerunners/plugin/` (repo independiente, ignorado por el git del
-> tema).
+> `themes/<nombre>/` (ficheros de tema), y `omarchy plugin add` clona el repo
+> en la raíz de `plugins/<id>/` esperando un `manifest.json` en la raíz. No
+> pueden compartir la misma raíz → son dos repos.
 
 ## Requisitos
 - Omarchy (Hyprland + Quickshell)
@@ -43,74 +44,64 @@ El sistema de Omarchy separa **temas** y **plugins**:
 ## Instalación (comandos internos de Omarchy)
 ```bash
 # 1) Tema
-omarchy theme install https://github.com/p3lusa/edgerunners.git
+omarchy theme install https://github.com/p3lusa/video-wallpaper.git
 
 # 2) Plugin de video
-omarchy plugin add https://github.com/p3lusa/edgerunners-wallpaper.git --enable
+omarchy plugin add https://github.com/p3lusa/video-background.git --enable
 
 # 3) Ceder la capa de fondo al renderizador de video (una vez)
 omarchy plugin disable omarchy.background
 
 # 4) Aplicar el tema
-omarchy theme set edgerunners
+omarchy theme set video-wallpaper
 ```
 
 ## Actualización / desinstalación
 ```bash
 # Actualizar (el clone se actualiza; re-aplicar el tema re-stagea los assets)
 omarchy theme update
-omarchy theme set edgerunners
+omarchy theme set video-wallpaper
 omarchy plugin update p3lu.video-background
 
 # Desinstalar (restaura el comportamiento de imagen stock)
-omarchy theme remove edgerunners
+omarchy theme remove video-wallpaper
 omarchy plugin remove p3lu.video-background --yes
 omarchy plugin enable omarchy.background
 ```
 
 > **Nota:** `omarchy theme update` hace `git pull` en el clone, pero el tema
 > activo es una copia staged en `~/.local/state/omarchy/current/theme/` — por
-> eso la actualización termina con `omarchy theme set edgerunners` (re-stage +
-> transición, sin reiniciar shell).
+> eso la actualización termina con `omarchy theme set video-wallpaper`
+> (re-stage + transición, sin reiniciar shell).
 
-## Vídeos: dónde van y cómo añadir los tuyos
-Los clips viven en **`videos/`** (raíz del repo del tema), un `*.mp4` por
-fondo. Cada clip tiene su PNG emparejado en `backgrounds/` **con el mismo
-nombre base** (ese PNG es el fallback, el lock screen y lo que ve `bg next`
-entre videos).
+## Vídeos: añade los tuyos
+Los clips viven en **`videos/`** (raíz del tema), un `*.mp4` por fondo. Cada
+clip tiene su PNG emparejado en `backgrounds/` **con el mismo nombre base**
+(ese PNG es el fallback, el lock screen y lo que ve `bg next` entre videos).
 
-### Clips personales (uso local)
-Este repo solo distribuye los loops originales de `videos/`. Si quieres tus
-propios clips (p. ej. de
-[moewalls.com/cyberpunk-edgerunners](https://moewalls.com/tag/cyberpunk-edgerunners/),
-para uso personal), déjalos como **ficheros no versionados** en el clone
-instalado — `git pull` no los toca:
+Este repo solo distribuye los 2 loops originales. Para tus propios clips:
 
 ```bash
-cp ~/Videos/edgerunners/*.mp4   ~/.config/omarchy/themes/edgerunners/videos/
-cp ~/Videos/edgerunners/frames/*.png ~/.config/omarchy/themes/edgerunners/backgrounds/
-omarchy theme set edgerunners   # re-stagea el clone completo (incluidos los tuyos)
-```
-
-> Si no quieres que aparezcan en `git status`, añade sus nombres a
-> `~/.config/omarchy/themes/edgerunners/.git/info/exclude` (solo afecta a
-> ese clone, no al repo).
-
-```bash
-# Añadir/renovar un clip: re-encódelo con esta receta (1440p30, sin audio)
+# 1) Re-encódelo con esta receta (1440p30, sin audio)
 ffmpeg -i origen.mp4 \
   -vf "scale=2560:1440:flags=lanczos,fps=30" \
   -c:v libx264 -preset medium -crf 23 -profile:v high \
-  -an -movflags +faststart -y videos/NOMBRE.mp4
+  -an -movflags +faststart -y /tmp/NOMBRE.mp4
 
-# Y su PNG (frame al 40%, evita fades de apertura)
-dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 videos/NOMBRE.mp4)
-ffmpeg -ss "$(awk "BEGIN{printf \"%.3f\", $dur*0.4}")" -i videos/NOMBRE.mp4 \
-  -frames:v 1 -q:v 2 backgrounds/NOMBRE.png
+# 2) Y su PNG (frame al 40%, evita fades de apertura)
+dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 /tmp/NOMBRE.mp4)
+ffmpeg -ss "$(awk "BEGIN{printf \"%.3f\", $dur*0.4}")" -i /tmp/NOMBRE.mp4 \
+  -frames:v 1 -q:v 2 /tmp/NOMBRE.png
 
-# Publicar los cambios (los MP4 van por Git LFS)
-git add videos backgrounds && git commit && git push
+# 3) Mételos en el clone instalado (no-versionados: git pull no los toca)
+cp /tmp/NOMBRE.mp4 ~/.config/omarchy/themes/video-wallpaper/videos/
+cp /tmp/NOMBRE.png ~/.config/omarchy/themes/video-wallpaper/backgrounds/
+omarchy theme set video-wallpaper   # re-stagea el clone completo (incluidos los tuyos)
 ```
+
+> Si no quieres que aparezcan en `git status`, añade sus nombres a
+> `~/.config/omarchy/themes/video-wallpaper/.git/info/exclude` (solo afecta
+> a ese clone, no al repo).
 
 **Spec de los clips** (la recomendada; los loops incluidos son 1080p30):
 - `H.264` (decodificación por hardware; HEVC no probado en este stack)
@@ -124,8 +115,7 @@ git add videos backgrounds && git commit && git push
 - Coste medido: **~4 % de un núcleo** (AMD 780M, Vulkan H.264) en 1440p30
 
 > **Nota:** `omarchy theme set` re-stagea *todo* el clone (versionado + no
-> versionado), así que tus clips personales se incluyen solos en la copia
-> staged.
+> versionado), así que tus clips se incluyen solos en la copia staged.
 
 ## Cómo funciona el wallpaper de video
 - El plugin lee el **tema activo** (`~/.local/state/omarchy/current/theme`) y,
@@ -142,15 +132,16 @@ git add videos backgrounds && git commit && git push
 
 ## Estructura del proyecto
 ```
-edgerunners/            ← repo del TEMA (raíz)
+video-wallpaper/        ← repo del TEMA (raíz)
 ├── README.md  PLAN.md  DEBUG-TUNING.md  LICENSE
 ├── colors.toml  icons.theme
-├── mako.ini  hyprlock.conf  ...   (configs por app, Fase identidad)
+├── mako.ini  hyprlock.conf  ...   (configs por app de la skin)
 ├── backgrounds/          PNG (fallback + lock)
-├── videos/               MP4 (loops)
-└── plugin/               ← repo del PLUGIN (anidado, independiente)
-    ├── manifest.json
-    └── Background.qml
+└── videos/               MP4 (loops)
+
+video-background/       ← repo del PLUGIN (separado)
+├── manifest.json
+└── Background.qml
 ```
 
 ## Desarrollo
@@ -160,16 +151,15 @@ Ver [`PLAN.md`](PLAN.md) (plan por fases) y [`DEBUG-TUNING.md`](DEBUG-TUNING.md)
 ## Licencia y contenido de terceros
 - **Código y configs:** **MIT** (ver [`LICENSE`](LICENSE)).
 - **`videos/` y `backgrounds/` incluidos:** loops originales generados por
-  script (ffmpeg `geq`, sin material de terceros) → MIT.
-- **Clips de Edgerunners:** este repo **no** incluye clips, frames o
-  material derivado de Cyberpunk 2077: Edgerunners (© CDPR / Aniplex /
-  Trigger). Añade los tuyos para uso personal con la sección de arriba.
+  script (ffmpeg, sin material de terceros) → MIT.
+- **Tus clips:** los archivos de video que añadas para uso personal son
+  responsabilidad tuya. Este repo **no distribuye** material derivado de
+  terceros (series, películas, etc.).
 
 ## Créditos
 - **[Omarchy](https://github.com/basecamp/omarchy)** (MIT) — la plataforma.
   El plugin `p3lu.video-background` se deriva del plugin stock
   `omarchy.background` de Omarchy (misma licencia MIT).
-- **[moewalls.com — Cyberpunk: Edgerunners](https://moewalls.com/tag/cyberpunk-edgerunners/)** —
-  inspiración y fuente habitual de los clips que la gente se monta
-  (muchos proceden de Steam Community). Los clips que uses son responsabilidad
-  tuya: este repo no los distribuye.
+- **[moewalls.com](https://moewalls.com/)** — fuente habitual de clips de
+  anime/cyberpunk para uso personal (muchos proceden de Steam Community).
+  Los clips que uses son responsabilidad tuya: este repo no los distribuye.

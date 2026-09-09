@@ -1,4 +1,4 @@
-# Plan de desarrollo — Tema Edgerunners (wallpaper de video)
+# Plan de desarrollo — Tema Video Wallpaper
 
 **Ruta elegida: Ruta A** (renderizador de video como *plugin del shell*,
 superconjunto de `omarchy.background`).
@@ -12,7 +12,7 @@ superconjunto de `omarchy.background`).
 ## 1. Objetivos y restricciones
 
 **Objetivos**
-- Tema Cyberpunk 2077: Edgerunners completo (colores, iconos, configs, fondos).
+- Tema con skin neón completo (colores, iconos, configs, fondos).
 - Wallpaper de **video en bucle de alta calidad**, mudo.
 - Instalar / actualizar / desinstalar con los comandos internos de Omarchy.
 - Que Sigan funcionando: `omarchy theme set`, `omarchy theme bg next`, lock
@@ -53,7 +53,7 @@ superconjunto de `omarchy.background`).
   reproduce; si no, usa la imagen. El video es *aditivo*, no reemplaza la imagen.
 
 ## 3. Estructura de repos
-Ver README: `edgerunners/` = tema; `edgerunners/plugin/` = plugin.
+Ver README: `video-wallpaper/` = tema; `video-wallpaper/plugin/` = plugin.
 
 ## 4. Fases
 
@@ -79,7 +79,7 @@ Ver README: `edgerunners/` = tema; `edgerunners/plugin/` = plugin.
 4. **No** incluir `*.lua` / configs de terminal / `vscode.json` (se regeneran).
 5. `preview.png` (y `preview-unlock.png`) para el selector de temas.
 
-**Verificar:** en una máquina de prueba, `omarchy theme set edgerunners` aplica
+**Verificar:** en una máquina de prueba, `omarchy theme set video-wallpaper` aplica
 colores a shell/terminal/apps sin errores (`hyprctl configerrors` vacío).
 
 ### Fase 2 — Plugin de video (núcleo, Ruta A)
@@ -114,12 +114,12 @@ imagen.
 **Verificar:** `ffprobe` de cada MP4 (sin audio, res/fps correctos); los PNG existen.
 
 ### Fase 4 — Integración tema → video
-1. Instalar tema + plugin (ver README) y `omarchy theme set edgerunners`.
+1. Instalar tema + plugin (ver README) y `omarchy theme set video-wallpaper`.
 2. `omarchy plugin disable omarchy.background`.
 3. Comprobar transición tema→tema (video↔imagen) sin pantallazos.
 4. Lock screen: usa PNG (frame) vía `current/background` (sigue funcionando).
 
-**Verificar:** `omarchy theme set edgerunners` → video; `omarchy theme set <otro>`
+**Verificar:** `omarchy theme set video-wallpaper` → video; `omarchy theme set <otro>`
 → imagen; lock muestra PNG; `omarchy theme bg next` cicla imagen (en temas sin video).
 
 ### Fase 5 — Gestión con comandos internos (requisito clave)
@@ -127,7 +127,7 @@ Documentar y probar el ciclo completo:
 - **Instalar:** `omarchy theme install <url>` + `omarchy plugin add <url> --enable`
   + `omarchy plugin disable omarchy.background`.
 - **Actualizar:** `omarchy theme update` + `omarchy plugin update p3lu.video-background`.
-- **Desinstalar:** `omarchy theme remove edgerunners` + `omarchy plugin remove
+- **Desinstalar:** `omarchy theme remove video-wallpaper` + `omarchy plugin remove
   p3lu.video-background --yes` + `omarchy plugin enable omarchy.background`.
 
 **Verificar:** cada comando ejecutado de principio a fin sin errores; el estado
@@ -146,8 +146,8 @@ post-desinstalación == estado inicial (imagen stock, sin video).
 re-aplicar → video de vuelta. MP4 corrupto → imagen, sin crash del shell.
 
 ### Fase 7 — Publicar
-1. Subir el tema a `github.com/<user>/edgerunners` y el plugin a
-   `github.com/<user>/edgerunners-wallpaper`.
+1. Subir el tema a `github.com/<user>/video-wallpaper` y el plugin a
+   `github.com/<user>/video-background`.
 2. Etiqueta `v0.1.0`. Añadir `preview.png`.
 
 **Verificar:** en una máquina limpia, instalar desde los URLs públicos funciona.
@@ -156,12 +156,12 @@ re-aplicar → video de vuelta. MP4 corrupto → imagen, sin crash del shell.
 
 Estado: **COMPLETADO y PUBLICADO** (2025-09). Plugin v0.3.0 (rama de video + ciclo).
 Repos **públicos** (sin contenido de terceros, solo loops synth originales):
-`github.com/p3lusa/edgerunners` (tema, LFS) + `github.com/p3lusa/edgerunners-wallpaper` (plugin).
+`github.com/p3lusa/video-wallpaper` (tema, LFS) + `github.com/p3lusa/video-background` (plugin).
 Créditos: Omarchy (base del plugin, MIT) + moewalls.com (fuente de clips para uso personal).
-Clips personales del usuario: `~/Videos/edgerunners/` (no versionados).
+Clips personales del usuario: `~/Videos/clips/` (no versionados).
 
 - [x] `omarchy plugin validate plugin/` → 0
-- [x] `omarchy theme set edgerunners` aplica colores (sin `configerrors`)
+- [x] `omarchy theme set video-wallpaper` aplica colores (sin `configerrors`)
 - [x] `hyprctl configerrors` → sin errores
 - [x] Video en pantalla, mudo (sin pista de audio), en bucle (CPU ~3%)
 - [x] Tema sin `videos/` → imagen (fallback) — probado con `cpunk`

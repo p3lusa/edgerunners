@@ -1,4 +1,4 @@
-# Debug y Tuning — Tema Edgerunners
+# Debug y Tuning — Tema Video Wallpaper
 
 ## 1. Observabilidad (dónde mirar)
 - **Diagnóstico general:** `omarchy debug --no-sudo --print`
@@ -95,7 +95,7 @@
 - Objetivo: CPU de reposo con video **< ~15–20%** de un núcleo (con HW decode).
 
 ## 7. Regresión (probar en cada cambio)
-1. `omarchy theme set edgerunners` → video, colores OK, sin `configerrors`.
+1. `omarchy theme set video-wallpaper` → video, colores OK, sin `configerrors`.
 2. `omarchy theme set <otro>` → imagen.
 3. `omarchy theme bg next` → cicla imagen; en tema con videos **también
    avanza el clip** (1/N → N/N → 1/N).
@@ -106,10 +106,10 @@
    se usa `journalctl --user -t omarchy-shell | grep -E 'ERROR|FATAL'` + ping).
 
 ## 8. Publicación (Git LFS, GitHub)
-- **Regla:** el repo público **no** contiene clips/frames de Edgerunners
+- **Regla:** el repo público **no** contiene clips/frames de terceros
   (copyright CDPR/Aniplex/Trigger). Solo los loops synth originales.
   Los clips personales viven fuera del git (no-versionados en el clone o en
-  `~/Videos/edgerunners/`).
+  `~/Videos/clips/`).
 - **Pitfall — LFS GC tras force-push:** si reescribiste el historial
   (`git push --force`), GitHub puede hacer GC de los objetos LFS y dejar
   `404` en `media.githubusercontent.com` (clones nuevos → pointers rotos).
@@ -117,11 +117,11 @@
   (re-sube todos los objetos referenciados) y volver a probar con un clone
   anónimo (sin credenciales):
   ```bash
-  env -i HOME=/tmp/x PATH=$PATH git clone https://github.com/<user>/edgerunners.git /tmp/x
+  env -i HOME=/tmp/x PATH=$PATH git clone https://github.com/<user>/video-wallpaper.git /tmp/x
   cd /tmp/x && git lfs install --local && git lfs pull && file videos/*.mp4
   ```
 - **Verificación pública:** `gh repo view <repo> --json visibility -q .visibility`.
 - **Clips personales en el clone instalado:** copiar a
-  `~/.config/omarchy/themes/edgerunners/videos|backgrounds/` + nombres en
+  `~/.config/omarchy/themes/video-wallpaper/videos|backgrounds/` + nombres en
   `.git/info/exclude` → sobreviven a `theme update` (git pull) y `theme set`
   los incluye en el re-stage.
