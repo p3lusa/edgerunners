@@ -7,10 +7,12 @@ por defecto es neón (cian / magenta / amarillo sobre negro).
 
 > Preview: ![preview](preview.png)
 >
-> **Estado:** v0.3.0 — tema + plugin de video (v0.3.0) verificados en máquina
+> **Estado:** v0.4.0 — tema + plugin de video (v0.4.0) verificados en máquina
 > real. Incluye 3 clips de ejemplo (H.264, sin audio, vía Git LFS; material
 > libre de Wikimedia Commons, ver [`ATTRIBUTION.md`](ATTRIBUTION.md)) —
-> **añade tus propios clips** a `videos/` (ver [Vídeos](#vídeos-añade-los-tuyos)).
+> **añade tus propios clips** a `videos/` (ver [Vídeos](#vídeos-añade-los-tuyos)),
+> o genera un tema completo a partir de un clip con el helper de Aether
+> (ver [Tema desde un clip](#tema-desde-un-clip-aether)).
 
 ## Qué incluye
 - **Wallpaper de video**: un clip del tema activo en bucle y mudo como fondo
@@ -118,12 +120,36 @@ omarchy theme set video-wallpaper   # re-stagea el clone completo (incluidos los
 > **Nota:** `omarchy theme set` re-stagea *todo* el clone (versionado + no
 > versionado), así que tus clips se incluyen solos en la copia staged.
 
+## Tema desde un clip (Aether)
+El plugin incluye `bin/video-theme.sh`: genera un **tema Omarchy completo** a
+partir de un clip — extrae un poster, [Aether](https://github.com/omacom/aether)
+deriva la paleta de colores y genera las configs (terminal, barra, lock
+screen, …), instala el tema en `~/.config/omarchy/themes/<nombre>/` con el clip
+en su `videos/`, y lo activa. Resultado: el wallpaper de video y todos los
+colores de acento del sistema salen del mismo clip.
+
+```bash
+~/.config/omarchy/plugins/p3lu.video-background/bin/video-theme.sh \
+  ~/Videos/mi-clip.mp4 mi-tema
+```
+
+Requisitos: `aether` en `PATH`, `ffmpeg`/`ffprobe`, y el plugin activo (sin él,
+el tema muestra el poster en lugar del video). Para actualizar el clip:
+sustituye el fichero en `videos/` del tema y `omarchy theme set <nombre>`.
+
 ## Cómo funciona el wallpaper de video
 - El plugin lee el **tema activo** (`~/.local/state/omarchy/current/theme`) y,
   si ese tema trae `videos/*.mp4`, reproduce el clip en bucle y mudo en la capa
   `Background` (un `MediaPlayer` por panel → multi-monitor).
 - **Ciclo:** `omarchy theme bg next` (o `bg set`) avanza al siguiente clip —
-  imagen y video avanzan juntos. `omarchy theme set` vuelve al clip 1.
+  el video se **deriva del fondo activo** (mismo nombre base que el PNG),
+  así imagen y video avanzan juntos y no pueden desincronizarse. El clip
+  activo sobrevive a reinicios del shell (el symlink de fondo es el estado
+  persistido de Omarchy); `omarchy theme set` (otro tema) vuelve al clip 1.
+- **Ahorro de energía:** el video se **pausa** con la sesión bloqueada o en
+  idle (el screensaver cubre el escritorio) y reanuda in situ al volver.
+- **Sin flash negro:** el video solo se muestra tras el primer frame decodificado;
+  hasta entonces se ve el PNG del clip.
 - Si el tema **no** trae `videos/`, el plugin se comporta exactamente como el
   `omarchy.background` stock: pinta la imagen de `current/background`. Así
   `omarchy theme set`, `omarchy theme bg next`, las transiciones y el lock
