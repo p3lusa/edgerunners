@@ -120,6 +120,22 @@ omarchy theme set video-wallpaper   # re-stagea el clone completo (incluidos los
 > **Nota:** `omarchy theme set` re-stagea *todo* el clone (versionado + no
 > versionado), así que tus clips se incluyen solos en la copia staged.
 
+## Gestor de la librería (TUI)
+`video-manage` es una interfaz de terminal (con `gum`, con los colores del
+tema activo) para gestionar toda la librería: ver los clips con su estado
+(● el que está sonando, [own palette]/[library]), reproducir cualquiera
+(vídeo + paleta), **añadir** uno nuevo (selector de fichero nativo → tema
+per-clip con paleta Aether → espejado en la librería con hardlinks) y
+**borrar** uno (con confirmación, de todas partes: tema per-clip, copias de
+librería y lista de ciclo). Si el clip que borras está sonando, cambia a otro
+antes; nunca toca tus ficheros originales.
+
+```bash
+video-manage              # el TUI
+video-add.sh clip.mp4     # añadir sin TUI (--strip-audio para quitar el audio)
+video-remove.sh nombre    # borrar sin TUI
+```
+
 ## Tema desde un clip (Aether)
 El plugin incluye `bin/video-theme.sh`: genera un **tema Omarchy completo** a
 partir de un clip — extrae un poster, [Aether](https://github.com/omacom/aether)
