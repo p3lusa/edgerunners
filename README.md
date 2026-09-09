@@ -7,10 +7,10 @@ por defecto es neón (cian / magenta / amarillo sobre negro).
 
 > Preview: ![preview](preview.png)
 >
-> **Estado:** v0.2.0 — tema + plugin de video (v0.3.0) verificados en máquina
-> real. Incluye 2 loops **originales** de neón (H.264, sin audio, vía Git LFS)
-> como wallpaper de arranque — **añade tus propios clips** a `videos/`
-> (ver [Vídeos](#vídeos-añade-los-tuyos)).
+> **Estado:** v0.3.0 — tema + plugin de video (v0.3.0) verificados en máquina
+> real. Incluye 3 clips de ejemplo (H.264, sin audio, vía Git LFS; material
+> libre de Wikimedia Commons, ver [`ATTRIBUTION.md`](ATTRIBUTION.md)) —
+> **añade tus propios clips** a `videos/` (ver [Vídeos](#vídeos-añade-los-tuyos)).
 
 ## Qué incluye
 - **Wallpaper de video**: un clip del tema activo en bucle y mudo como fondo
@@ -79,7 +79,8 @@ Los clips viven en **`videos/`** (raíz del tema), un `*.mp4` por fondo. Cada
 clip tiene su PNG emparejado en `backgrounds/` **con el mismo nombre base**
 (ese PNG es el fallback, el lock screen y lo que ve `bg next` entre videos).
 
-Este repo solo distribuye los 2 loops originales. Para tus propios clips:
+Este repo distribuye 3 clips de ejemplo (material libre, ver
+[`ATTRIBUTION.md`](ATTRIBUTION.md)). Para añadir los tuyos:
 
 ```bash
 # 1) Re-encódelo con esta receta (1440p30, sin audio)
@@ -150,8 +151,9 @@ Ver [`PLAN.md`](PLAN.md) (plan por fases) y [`DEBUG-TUNING.md`](DEBUG-TUNING.md)
 
 ## Licencia y contenido de terceros
 - **Código y configs:** **MIT** (ver [`LICENSE`](LICENSE)).
-- **`videos/` y `backgrounds/` incluidos:** loops originales generados por
-  script (ffmpeg, sin material de terceros) → MIT.
+- **`videos/` y `backgrounds/` incluidos:** material libre de
+  [Wikimedia Commons](https://commons.wikimedia.org/) (CC0 / CC BY) —
+  atribución completa en [`ATTRIBUTION.md`](ATTRIBUTION.md).
 - **Tus clips:** los archivos de video que añadas para uso personal son
   responsabilidad tuya. Este repo **no distribuye** material derivado de
   terceros (series, películas, etc.).
@@ -160,6 +162,8 @@ Ver [`PLAN.md`](PLAN.md) (plan por fases) y [`DEBUG-TUNING.md`](DEBUG-TUNING.md)
 - **[Omarchy](https://github.com/basecamp/omarchy)** (MIT) — la plataforma.
   El plugin `p3lu.video-background` se deriva del plugin stock
   `omarchy.background` de Omarchy (misma licencia MIT).
+- **[Wikimedia Commons](https://commons.wikimedia.org/)** — fuente de los
+  clips de ejemplo incluidos (ver [`ATTRIBUTION.md`](ATTRIBUTION.md)).
 - **[moewalls.com](https://moewalls.com/)** — fuente habitual de clips de
   anime/cyberpunk para uso personal (muchos proceden de Steam Community).
   Los clips que uses son responsabilidad tuya: este repo no los distribuye.

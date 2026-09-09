@@ -22,8 +22,9 @@ SOFTWARE.
 
 NOTA DE MEDIA
 -------------
-Los loops incluidos en `videos/` son originales (generados por script, sin
-material de terceros) y están cubiertos por esta licencia MIT. Los clips que
-añadas a `videos/` para uso personal son responsabilidad tuya: este repo no
-distribuye material derivado de terceros (series, películas, etc.) y ese
-material no está cubierto por esta licencia.
+Los clips incluidos en `videos/` son material libre de Wikimedia Commons
+(CC0 / CC BY) — ver ATTRIBUTION.md para la atribución completa y las
+los términos de sus licencias; ese material **no** está cubierto por la MIT de
+arriba. Los clips que añadas a `videos/` para uso personal son
+responsabilidad tuya: este repo no distribuye material derivado de terceros
+(series, películas, etc.) y ese material no está cubierto por esta licencia.
