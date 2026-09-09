@@ -144,6 +144,11 @@ es un tema, **cada cambio de vídeo cambia también toda la paleta del sistema**
 solos cuando se abandonan (no están activos ni en la lista de ciclo), así que
 no ensucian el selector de temas.
 
+> **Sin duplicados:** si un clip existe a la vez como tema propio (con su
+> paleta) y como fichero suelto en `videos/` de otro tema (p. ej.
+> `video-wallpaper`), el ciclo y el selector solo lo visitan una vez —
+> siempre por su tema propio, el que lleva la paleta.
+
 ## Cómo funciona el wallpaper de video
 - El plugin lee el **tema activo** (`~/.local/state/omarchy/current/theme`) y,
   si ese tema trae `videos/*.mp4`, reproduce el clip en bucle y mudo en la capa
