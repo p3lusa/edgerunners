@@ -1,0 +1,29 @@
+# Edgerunners — Cyberpunk 2077 (paleta inicial; ajustar en Fase identidad)
+# Los roles (accent/foreground/background/...) gobiernan shell, barra,
+# notificaciones, OSD y menús. Los colores 0-15 alimentan terminal/apps.
+
+accent   = "#00f0ff"   # cian neón — firma de Edgerunners
+cursor   = "#fcee0a"   # amarillo ácido
+foreground = "#e6e6f0"
+background = "#0a0a12" # casi negro, Night City
+
+selection_foreground = "#0a0a12"
+selection_background = "#00f0ff"
+
+# 16 ANSI (0-7 normales, 8-15 brillantes)
+color0  = "#0a0a12"
+color1  = "#ff2a6d"   # rojo/rosa neón
+color2  = "#05ffa1"   # verde neón
+color3  = "#fcee0a"   # amarillo ácido
+color4  = "#2b6fff"   # azul eléctrico
+color5  = "#ff2bd6"   # magenta
+color6  = "#00f0ff"   # cian neón
+color7  = "#e6e6f0"   # blanco roto
+color8  = "#4a4a5e"
+color9  = "#ff5c8a"
+color10 = "#7dffc4"
+color11 = "#fff57a"
+color12 = "#5c9dff"
+color13 = "#ff7ae0"
+color14 = "#7afcff"
+color15 = "#ffffff"

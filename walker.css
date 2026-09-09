@@ -1,0 +1,212 @@
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  W A L K E R  //  EDGERUNNERS  //  REV. 00.1                ║
+   ║  Night City — chrome, neon, rain                            ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+
+/* ── PALETTE ──────────────────────────────────────────────────── */
+@define-color selected-text #4a4a5e;
+@define-color text          #e6e6f0;
+@define-color base          #0a0a12;
+@define-color border        #00f0ff;
+@define-color foreground    #e6e6f0;
+@define-color background    #0a0a12;
+
+/* derived */
+@define-color void-mid      #0d0d1a;
+@define-color engraved      #121222;
+@define-color hairline      #1f1f38;
+@define-color matte         #3d3d5c;
+@define-color signal-dim    #06333a;
+@define-color signal-glow   #7afcff;
+@define-color neon-mag      #ff2bd6;
+@define-color neon-yel      #fcee0a;
+
+/* ── RESET ────────────────────────────────────────────────────── */
+window * {
+    all:         unset;
+    background:  none;
+    border:      none;
+    margin:      0;
+    padding:     0;
+    font-size:   15px;
+    font-family: "JetBrains Mono", "Iosevka", "Fira Code", monospace;
+    color:       @selected-text;
+    -gtk-icon-size: 0;
+}
+
+/* ── ICON SUPPRESSION ─────────────────────────────────────────── */
+window .normal-icons,
+window .large-icons,
+window .item-image,
+window .symbols,
+window image {
+    min-width:  0;
+    min-height: 0;
+    padding:    0;
+    margin:     0;
+    opacity:    0;
+}
+
+/* ── OUTER SHELL ──────────────────────────────────────────────── */
+window .box-wrapper {
+    background:    @base;
+    border-top:    1px solid alpha(@border, 0.9);
+    border-left:   1px solid alpha(@border, 0.5);
+    border-right:  1px solid alpha(@hairline, 0.2);
+    border-bottom: 1px solid alpha(@hairline, 0.4);
+    border-radius: 2px;
+    padding:       10px 10px 8px;
+    margin:        0;
+
+    box-shadow:
+        0 0 0 1px alpha(@base, 1),
+        0 0 18px alpha(@border, 0.08),
+        0 0 60px alpha(@base, 0.95),
+        inset 0 1px 0 alpha(@border, 0.1),
+        inset 0 0 40px alpha(@void-mid, 0.6);
+}
+
+/* ── SEARCH BAR ───────────────────────────────────────────────── */
+window .search-container {
+    background:    @void-mid;
+    border-top:    1px solid alpha(@border, 0.6);
+    border-left:   1px solid alpha(@border, 0.25);
+    border-right:  1px solid alpha(@hairline, 0.2);
+    border-bottom: 1px solid alpha(@engraved, 0.9);
+    border-radius: 1px;
+    padding:       7px 10px;
+    margin:        0 0 8px 0;
+
+    box-shadow:
+        inset 0 2px 8px alpha(@base, 0.95),
+        inset 0 -1px 0 alpha(@border, 0.06),
+        0 0 12px alpha(@border, 0.05);
+}
+
+window .search-container text {
+    color:          @text;
+    caret-color:    @border;
+    letter-spacing: 0.04em;
+}
+
+window .input {
+    background:     transparent;
+    color:          @text;
+    letter-spacing: 0.04em;
+}
+
+/* ── RESULT LIST ──────────────────────────────────────────────── */
+window .list-box,
+window scrolledwindow {
+    background: transparent;
+}
+
+/* ── INDIVIDUAL ITEMS ─────────────────────────────────────────── */
+window .item-box {
+    padding:        4px 8px;
+    border-radius:  1px;
+    border-left:    2px solid transparent;
+    transition:     all 0.15s ease-out;
+    letter-spacing: 0.02em;
+    color:          @matte;
+}
+
+window .item-box label,
+window .item-box * {
+    color: @matte;
+}
+
+/* ── SELECTION — the neon moment ──────────────────────────────── */
+child:selected {
+    background-color: transparent;
+}
+
+child:selected .item-box {
+    background: linear-gradient(
+                    90deg,
+                    alpha(@signal-dim, 0.7) 0%,
+                    alpha(@signal-dim, 0.2) 60%,
+                    transparent 100%
+                );
+
+    border-left:  2px solid @border;
+    padding-left: 12px;
+
+    /* dual-channel neon: cyan + magenta fringe */
+    box-shadow:
+        -1px 0 0 alpha(@neon-mag, 0.35),
+         1px 0 0 alpha(@border, 0.3),
+        0 0 16px alpha(@border, 0.1);
+
+    transition: all 0.12s ease-out;
+}
+
+child:selected .item-box label,
+child:selected .item-box * {
+    color: @text;
+}
+
+/* ── PREVIEW PANEL ────────────────────────────────────────────── */
+window .preview {
+    background:    @void-mid;
+    border-top:    1px solid alpha(@border, 0.25);
+    border-left:   1px solid alpha(@border, 0.15);
+    border-right:  1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-radius: 1px;
+    padding:       10px 12px;
+    margin:        8px 0 0;
+    color:         @selected-text;
+    line-height:   1.5;
+    letter-spacing: 0.02em;
+    font-size:     13px;
+
+    box-shadow:
+        inset 0 1px 0 alpha(@base, 0.9),
+        inset 0 0 30px alpha(@base, 0.5);
+}
+
+/* ── SCROLLBAR — hairline only ────────────────────────────────── */
+scrollbar {
+    background: transparent;
+    min-width:  2px;
+    min-height: 2px;
+}
+
+scrollbar slider {
+    background:    alpha(@border, 0.35);
+    border-radius: 1px;
+    min-width:     2px;
+    min-height:    20px;
+    margin:        0;
+}
+
+scrollbar slider:hover {
+    background: alpha(@border, 0.7);
+}
+
+/* ── TYPOGRAPHY HIERARCHY ─────────────────────────────────────── */
+window .item-box .item-name {
+    font-size:      15px;
+    font-weight:    400;
+    letter-spacing: 0.03em;
+    color:          @selected-text;
+}
+
+window .item-box .item-sub,
+window .item-box .item-description {
+    font-size:      12px;
+    color:          @matte;
+    letter-spacing: 0.05em;
+    margin-top:     1px;
+}
+
+child:selected .item-box .item-name {
+    color:          @text;
+    letter-spacing: 0.04em;
+}
+
+child:selected .item-box .item-sub,
+child:selected .item-box .item-description {
+    color: @signal-glow;
+}

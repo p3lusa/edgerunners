@@ -1,0 +1,20 @@
+# Repos anidado (se gestiona por separado; se publica como repo propio)
+/plugin/
+
+# Basura de SO / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Caches / temporales de Omarchy (jamás commitear)
+.cache/
+*.tmp
+background-transitions/
+
+# Media en preparación (los assets finales van a backgrounds/ y videos/)
+*.part
+*.partial
+tmp/
