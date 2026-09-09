@@ -18,3 +18,7 @@ background-transitions/
 *.part
 *.partial
 tmp/
+
+# Notas de desarrollo locales (fuera del repo público)
+PLAN.md
+DEBUG-TUNING.md

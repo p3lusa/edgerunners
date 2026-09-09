@@ -134,7 +134,7 @@ omarchy theme set video-wallpaper   # re-stagea el clone completo (incluidos los
 ## Estructura del proyecto
 ```
 video-wallpaper/        ← repo del TEMA (raíz)
-├── README.md  PLAN.md  DEBUG-TUNING.md  LICENSE
+├── README.md  ATTRIBUTION.md  LICENSE
 ├── colors.toml  icons.theme
 ├── mako.ini  hyprlock.conf  ...   (configs por app de la skin)
 ├── backgrounds/          PNG (fallback + lock)
@@ -144,10 +144,6 @@ video-background/       ← repo del PLUGIN (separado)
 ├── manifest.json
 └── Background.qml
 ```
-
-## Desarrollo
-Ver [`PLAN.md`](PLAN.md) (plan por fases) y [`DEBUG-TUNING.md`](DEBUG-TUNING.md)
-(debug y tuning).
 
 ## Licencia y contenido de terceros
 - **Código y configs:** **MIT** (ver [`LICENSE`](LICENSE)).
