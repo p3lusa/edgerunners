@@ -1,7 +1,7 @@
 # Plan — Aceleración por hardware (GPU) de la decodificación de vídeo
 
-**Estado: INVESTIGADO, pendiente de aprobación (2026-09-10). No se ha tocado
-nada todavía.**
+**Estado: fase 1 (detección) HECHA y verificada (2026-09-10). Fases 2–6
+pendientes de aprobación.**
 
 **Objetivo:** que el wallpaper en vídeo se decodifique en la GPU (no en CPU),
 detectando el tipo de gráfica del usuario (NVIDIA / AMD / Intel) y aplicando la
@@ -91,26 +91,26 @@ Detección + aplicación de la aceleración. Sin dependencias nuevas (usa `lspci
 legible (`hwaccel.log`) con lo detectado y lo aplicado, para diagnóstico.
 
 ### 2.2 Detección de la gráfica (orden de decisión)
-1. **NVIDIA:** `nvidia-smi` existe y responde **y/o** `lspci` muestra `NVIDIA`
-   y hay nodo `cuda` (`/dev/nvidia0` o `nvidia-smi -L`).
-   → Backend de decode: `cuda`. Vars:
-   `QT_FFMPEG_DECODING_HW_DEVICE_TYPES=cuda` (+ opcional `qsv` no aplica).
-   Fallback en lista: `cuda,vdpau` (vdpau por si cuda falla y el driver lo trae).
+El script **enumera TODAS** las GPUs de vídeo (integradas y dedicadas) vía
+`lspci -nnk` (PCI + vendor + driver in-use) y **mapea cada nodo de render
+`/dev/dri/by-path/*-render` a su GPU física** por PCI. Luego decide:
+1. **NVIDIA:** `nvidia-smi` responde **y/o** `lspci` muestra NVIDIA con driver.
+   → `QT_FFMPEG_DECODING_HW_DEVICE_TYPES=cuda` (NVDEC vive en la dGPU).
 2. **Intel (iGPU) / AMD (iGPU o dGPU) / otras:** hay `/dev/dri/renderD*` y
-   `lspci`/`lsmod` confirma `i915` (Intel) o `amdgpu` (AMD).
-   → Backend de decode: `vaapi`. Vars:
-   `QT_FFMPEG_DECODING_HW_DEVICE_TYPES=vaapi` y
-   `QT_FFMPEG_HW_ALLOW_PROFILE_MISMATCH=1` (amplía cobertura de perfiles H.264/HEVC).
+   `lspci`/`lsmod` confirma `i915`/`amdgpu`. → `vaapi` +
+   `QT_FFMPEG_HW_ALLOW_PROFILE_MISMATCH=1`.
+   **Preferencia de nodo en híbrido:** si hay varios `renderD*`, elige el de la
+   dGPU no-Intel (así un portátil iGPU+dGPU apunta el decode a la dGPU).
    (VAAPI cubre Intel y AMD; es el camino único para los iGPU del mercado.)
-3. **Nada de lo anterior** (o el nodo `renderD*` no existe / no es accesible):
-   → **No forzar nada.** Dejar el backend por defecto (CPU) y dejar
-   `hwaccel.env` vacío o con un comentario. **Nunca romper el wallpaper.**
+3. **Nada de lo anterior** (o sin `renderD*`): **no forzar nada** → CPU.
+   `hwaccel.env` con solo un comentario. **Nunca romper el wallpaper.**
 
-> Nota: en sistemas con **doble GPU** (iGPU + dGPU) la decisión debe elegir el
-> nodo de render correcto. Regla: preferir la dGPU para el vídeo si hay
-> `renderD*` asociado a la dGPU (por `lspci`/`/sys`); si no es trivial, VAAPI
-> sobre el nodo por defecto ya ahorra CPU respecto a software. Esto se refina
-> en la fase de implementación si aparece un caso real.
+> **Dedicada vs integrada:** se DISTINGUIEN en el log (cada GPU con su PCI,
+> vendor y nodo). En híbrido se prefiere el nodo de la dGPU. Limitación real:
+> el backend FFmpeg de Qt **no permite fijar un nodo concreto** (no hay env
+> var), así que en la práctica VAAPI usa el nodo por defecto de la sesión; la
+> enumeración + el `hwaccel.log` muestran qué nodo corresponde a qué chip, y la
+> preferencia de nodo queda documentada para el caso en que Qt lo permita.
 
 ### 2.3 Mecanismo de aplicación (a elegir en impl., por robustez)
 Orden de preferencia (el que funcione primero y sea portable gana):
@@ -158,7 +158,7 @@ Tras aplicar y reiniciar el shell, comprobar en vivo:
 | # | Tarea | Verificación |
 |---|-------|--------------|
 | 0 | (hecha) Investigación + este plan | — |
-| 1 | Escribir `video-hwaccel.sh`: detección NVIDIA/Intel/AMD + nodo `renderD*`, generación de `hwaccel.env` + `hwaccel.log`. **Solo detección, sin aplicar todavía.** | Ejecutar → `hwaccel.log` muestra "AMD → vaapi" y el `env` tiene las 3 vars. |
+| 1 | **(HECHA)** `video-hwaccel.sh`: enumera todas las GPUs + mapeo de nodos, detección NVIDIA/Intel/AMD, preferencia de dGPU en híbrido, `hwaccel.env` + `hwaccel.log`. **Solo detección, sin aplicar.** | ✅ Ejecutado: "AMD → vaapi" (esta máquina); stubs: NVIDIA→cuda, híbrido→vaapi eligiendo nodo de dGPU, sin-GPU→cpu. `bash -n` OK. |
 | 2 | Elegir + implementar el mecanismo de inyección (uwsm env / drop-in / post-update) para que `quickshell` herede las vars. | Tras `omarchy refresh shell`, `/proc/<quickshell>/*/environ` contiene `QT_FFMPEG_DECODING_HW_DEVICE_TYPES=vaapi`. |
 | 3 | Verificar que VAAPI **de hecho** decodifica el wallpaper (fds de `renderD*`, CPU baja, log Qt). | Comparar CPU/fds con y sin la variable. |
 | 4 | Revisión de seguridad del nuevo script (mismo estándar que los 13 actuales: `set -euo pipefail`, quoting, sin `eval`, `rm` acotado). | `bash -n` + el checklist de seguridad. |
@@ -184,19 +184,20 @@ Tras aplicar y reiniciar el shell, comprobar en vivo:
 
 ---
 
-## 5. Open questions (para decidir antes de implementar)
+## 5. Open questions (estado)
 
-1. **¿Auto-configurar o manual?**
-   - (A, recomendado) `video-hwaccel.sh` se auto-ejecuta al añadir el primer
-     clip y al `post-update`; el usuario no hace nada.
-   - (B) Comando explícito `video-hwaccel.sh` que el usuario lanza cuando quiera.
-2. **¿Forzar solo VAAPI (lista corta) o lista de prioridades larga?**
-   - Recomendado: lista corta específica del vendor (`vaapi` / `cuda`) para que
-     la decisión sea predecible; Qt ya hace fallback a CPU si el backend falla.
+1. ~~**¿Auto-configurar o manual?**~~ → **RESUELTO (2026-09-10):** (A)
+   auto-config — `video-hwaccel.sh` se ejecuta al añadir el primer clip y en el
+   `post-update` hook.
+2. ~~**¿Lista corta o larga?**~~ → **RESUELTO (2026-09-10):** lista corta
+   específica del vendor (`vaapi` / `cuda`); Qt hace fallback a CPU si falla.
 3. **¿Añadir `vainfo` como dep de verificación?** (opcional; hoy no está). Útil
-   para el log de diagnóstico, pero `ffmpeg` ya sirve de sonda.
-4. **Doble GPU:** ¿priorizar dGPU para el vídeo o dejar el nodo por defecto?**
-   (Recomendado: nodo por defecto salvo que el caso real lo exija.)
+   para el log de diagnóstico, pero `ffmpeg` ya sirve de sonda. **Abierta** —
+   se decide en la fase 3 si hace falta más visibilidad.
+4. ~~**¿Doble GPU: priorizar dGPU o nodo por defecto?**~~ → **RESUELTO
+   (2026-09-10):** el script enumera todas las GPUs y elige el nodo de la dGPU
+   no-Intel cuando hay varios; la limitación real (Qt no fija nodo) queda
+   documentada en §2.2.
 
 ---
 
