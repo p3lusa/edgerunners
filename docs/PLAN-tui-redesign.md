@@ -1,5 +1,10 @@
 # Plan — Rediseño del TUI (estilo moderno)
 
+**Estado: ✅ implementado y verificado (2026-09-10, commit `5ca23d2`).**
+Decisiones resueltas: (1) miniatura **sí**, sin chafa — protocolo kitty nativo
+(vía ffmpeg, zero-dep) + sixel opcional si `chafa` está, con fallback a texto;
+(2) `r` = **picker**; (3) layout **A** (hero header fijo).
+
 **Objetivo:** un TUI atractivo y moderno para `video-manage`, manteniendo el stack
 **sin dependencias extra** (fzf + gum, temado por la paleta activa de Omarchy).
 
@@ -97,11 +102,9 @@
   zero-dep. Si se prefiere estrictamente zero-deps, D se hace solo vía protocolo
   nativo del terminal (sin chafa) o se omite.
 
-## Open questions (para decidir antes de arrancar)
+## Open questions (resueltas 2026-09-10)
 
-1. ¿Miniatura del poster **sí/no**? ¿Dep opcional `chafa` aceptable o estricto
-   zero-deps?
-2. ¿`r` = **picker** (como en `PLAN-tui-fixes.md` punto 3) o "borrar el destacado"?
-   (afecta los hints del footer)
-3. ¿**Hero header** fijo arriba, o layout de **dos paneles** (lista | detalle) tipo
-   file manager?
+1. ¿Miniatura del poster **sí/no**? → **Sí**, sin chafa: protocolo kitty nativo
+   (ffmpeg, zero-dep); sixel opcional si `chafa` está; fallback a texto.
+2. ¿`r` = **picker** o "borrar el destacado"? → **picker** (ya era el fix 3).
+3. ¿**Hero header** fijo o **dos paneles**? → **Hero header** (layout A).
