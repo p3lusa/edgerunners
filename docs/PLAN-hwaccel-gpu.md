@@ -1,7 +1,8 @@
 # Plan — Aceleración por hardware (GPU) de la decodificación de vídeo
 
-**Estado: fase 1 (detección) HECHA y verificada (2026-09-10). Fases 2–6
-pendientes de aprobación.**
+**Estado: FASES 1–3 Y 5 HECHAS y verificadas en vivo (2026-09-10/11). VAAPI
+decodifica el wallpaper en la GPU. Fases 4 (seguridad) y 6 (docs README)
+pendientes.**
 
 **Objetivo:** que el wallpaper en vídeo se decodifique en la GPU (no en CPU),
 detectando el tipo de gráfica del usuario (NVIDIA / AMD / Intel) y aplicando la
@@ -53,12 +54,20 @@ no cambiar flags de ffmpeg en un script.**
   está desactivada por defecto** (se activa con `QT_XCB_GL_INTEGRATION=xcb_egl`,
   solo en X11). En Wayland esto no aplica → no es un bloqueante.
 
-### 1.4 Por qué "no cargaba VAAPI por defecto"
-El proceso `quickshell` **no tiene ninguna de esas variables en su entorno**
-(ningún unit omarchy define `QT_FFMPEG_*`). Qt intenta autodetectar el backend
-HW, pero en la práctica no estaba enganchando VAAPI (lo observó el usuario).
-La solución robusta es **forzar la prioridad explícitamente** en el entorno de
-la sesión, en vez de confiar en la autodetección.
+### 1.4 Por qué "no cargaba VAAPI por defecto" (root cause real, verificado)
+**No era que la variable no estuviera.** El usuario ya había intentado forzarlo
+vía `hl.env("QT_FFMPEG_DECODING_HW_DEVICE_TYPES","vaapi")` en
+`~/.config/hypr/autostart.lua` (el comentario de ese fichero lo documenta). El
+problema real era el **orden de sondeo por defecto de Qt**: al no fijar la
+prioridad, el backend FFmpeg de Qt probaba `vdpau → vulkan → cuda` (todos
+fallando en esta AMD integrada) antes de llegar a `vaapi`, llenando el journal
+con "Invalid setup for format vdpau/vulkan/cuda" en cada arranque de clip.
+Fijar `QT_FFMPEG_DECODING_HW_DEVICE_TYPES=vaapi` **soluciona** el sondeo y
+VAAPI decodifica (verificado en vivo, §2.5).
+
+> Consecuencia: la solución es **forzar la prioridad explícitamente** en el
+> entorno de la sesión, de forma **portable** (no un `hl.env` a mano que
+> `omarchy refresh hyprland` pisa y que no cubre NVIDIA).
 
 ### 1.5 Dónde inyectar el entorno
 - `quickshell` (pid 256768) es hijo de `omarchy-launch-` (256766) y está bajo el
@@ -112,20 +121,27 @@ El script **enumera TODAS** las GPUs de vídeo (integradas y dedicadas) vía
 > enumeración + el `hwaccel.log` muestran qué nodo corresponde a qué chip, y la
 > preferencia de nodo queda documentada para el caso en que Qt lo permita.
 
-### 2.3 Mecanismo de aplicación (a elegir en impl., por robustez)
-Orden de preferencia (el que funcione primero y sea portable gana):
-1. **Fichero de entorno de la sesión de uwsm/Omarchy** heredado por
-   `quickshell` (el `env_session.conf` que ya carga el unit del WM, o el punto
-   equivalente que use la instalación). Es el camino "de serie" de Omarchy.
-2. **Drop-in de systemd** sobre el unit que lanza la sesión del WM
-   (`wayland-wm@hyprland.desktop.service`) añadiendo
-   `EnvironmentFile=~/.config/omarchy/plugins/p3lu.video-background/hwaccel.env`.
-3. **`post-update` hook** (ya existe en el tema) que re-aplique el entorno y
-   avise de que hay que `omarchy refresh shell` para que entre en vigor.
+### 2.3 Mecanismo de aplicación (ELEGIDO: drop-in de systemd user)
+Se implementó el **drop-in de systemd-user sobre la plantilla del WM**:
+- `video-hwaccel.sh --apply` escribe
+  `~/.config/systemd/user/wayland-wm@.service.d/10-video-hwaccel.conf` con
+  `[Service] EnvironmentFile=-<plugin>/hwaccel.env` y lanza
+  `systemctl --user daemon-reload`.
+- Es **portable** (funciona en cualquier Omarchy/Hyprland: el unit del WM es
+  `wayland-wm@.service`), **idempotente** (re-escrivo el fichero y el
+  `EnvironmentFile=-` con `-` no falla si no existe) y **no pelea** con el
+  `env_session.conf` de uwsm (que sigue cargando primero).
+- **No se tocó** `hl.env()` en `autostart.lua`: ese `hl.env` del usuario sigue
+  funcionando y el drop-in lo reemplaza de forma portable; al reiniciar sesión
+  ambos apuntan al mismo valor (`vaapi`), así que no hay conflicto.
+- La variable entra en vigor en el **siguiente arranque de la sesión**
+  (logout/login o `systemctl --user restart wayland-wm@.service`); la sesión
+  actual ya tenía su entorno y no se toca.
 
-El script debe **detectar cuál de los tres mecanismos existe** en la instalación
-y usarlo; si ninguno, imprimir las instrucciones manuales (`export QT_FFMPEG_…`)
-y no fallar en silencio.
+> Por qué no los otros dos: el `env_session.conf` de uwsm lo **sobrescribe**
+> `omarchy refresh`/`omarchy update`, y `hl.env` en `autostart.lua` lo pisa
+> `omarchy refresh hyprland`. El drop-in de systemd es el único que sobrevive a
+> ambas operaciones y es el que el plugin puede gestionar de forma idempotente.
 
 ### 2.4 Fallback y "no romper"
 - Si la detección falla → entorno vacío → Qt usa CPU (comportamiento actual,
@@ -159,10 +175,10 @@ Tras aplicar y reiniciar el shell, comprobar en vivo:
 |---|-------|--------------|
 | 0 | (hecha) Investigación + este plan | — |
 | 1 | **(HECHA)** `video-hwaccel.sh`: enumera todas las GPUs + mapeo de nodos, detección NVIDIA/Intel/AMD, preferencia de dGPU en híbrido, `hwaccel.env` + `hwaccel.log`. **Solo detección, sin aplicar.** | ✅ Ejecutado: "AMD → vaapi" (esta máquina); stubs: NVIDIA→cuda, híbrido→vaapi eligiendo nodo de dGPU, sin-GPU→cpu. `bash -n` OK. |
-| 2 | Elegir + implementar el mecanismo de inyección (uwsm env / drop-in / post-update) para que `quickshell` herede las vars. | Tras `omarchy refresh shell`, `/proc/<quickshell>/*/environ` contiene `QT_FFMPEG_DECODING_HW_DEVICE_TYPES=vaapi`. |
-| 3 | Verificar que VAAPI **de hecho** decodifica el wallpaper (fds de `renderD*`, CPU baja, log Qt). | Comparar CPU/fds con y sin la variable. |
+| 2 | **(HECHA)** Mecanismo de inyección: drop-in de systemd-user sobre `wayland-wm@.service` vía `video-hwaccel.sh --apply`. | ✅ Drop-in escrito + `daemon-reload`; el unit del WM incorpora el `EnvironmentFile` (verificado con `systemctl --user cat`). Apunta a la copia instalada del plugin. |
+| 3 | **(HECHA)** Verificar que VAAPI **de hecho** decodifica el wallpaper en vivo. | ✅ Con el wallpaper activo, `quickshell` pasa de 3 a **6 fds** de `renderD128` (composición + VAAPI), **CPU 0.1%**, journal muestra `h264 High 1920x1080` reproduciéndose. Root cause del fallo original documentado (§1.4). |
 | 4 | Revisión de seguridad del nuevo script (mismo estándar que los 13 actuales: `set -euo pipefail`, quoting, sin `eval`, `rm` acotado). | `bash -n` + el checklist de seguridad. |
-| 5 | Integración: `video-add.sh`/`video-theme.sh` (o un `post-update`) llaman a `video-hwaccel.sh` al añadir el primer clip, para autoconfigurar la aceleración la primera vez. | Añadir un clip → `hwaccel.env` generado. |
+| 5 | **(HECHA)** Integración: `video-add.sh` llama a `video-hwaccel.sh --apply` al añadir un clip (si el plugin está activo), y `hooks/post-update` lo re-aplica tras `omarchy update`. | ✅ Ambos hooks wired; `bash -n` OK. Auto-config idempotente. |
 | 6 | Docs (README: sección "GPU acceleration" + tabla de vendors) + commit + push. | — |
 
 ---
