@@ -1,8 +1,7 @@
 # Plan — Aceleración por hardware (GPU) de la decodificación de vídeo
 
-**Estado: FASES 1–3 Y 5 HECHAS y verificadas en vivo (2026-09-10/11). VAAPI
-decodifica el wallpaper en la GPU. Fases 4 (seguridad) y 6 (docs README)
-pendientes.**
+**Estado: TODAS LAS FASES HECHAS y verificadas en vivo (2026-09-10/11). VAAPI
+decodifica el wallpaper en la GPU. Completado.**
 
 **Objetivo:** que el wallpaper en vídeo se decodifique en la GPU (no en CPU),
 detectando el tipo de gráfica del usuario (NVIDIA / AMD / Intel) y aplicando la
@@ -177,9 +176,9 @@ Tras aplicar y reiniciar el shell, comprobar en vivo:
 | 1 | **(HECHA)** `video-hwaccel.sh`: enumera todas las GPUs + mapeo de nodos, detección NVIDIA/Intel/AMD, preferencia de dGPU en híbrido, `hwaccel.env` + `hwaccel.log`. **Solo detección, sin aplicar.** | ✅ Ejecutado: "AMD → vaapi" (esta máquina); stubs: NVIDIA→cuda, híbrido→vaapi eligiendo nodo de dGPU, sin-GPU→cpu. `bash -n` OK. |
 | 2 | **(HECHA)** Mecanismo de inyección: drop-in de systemd-user sobre `wayland-wm@.service` vía `video-hwaccel.sh --apply`. | ✅ Drop-in escrito + `daemon-reload`; el unit del WM incorpora el `EnvironmentFile` (verificado con `systemctl --user cat`). Apunta a la copia instalada del plugin. |
 | 3 | **(HECHA)** Verificar que VAAPI **de hecho** decodifica el wallpaper en vivo. | ✅ Con el wallpaper activo, `quickshell` pasa de 3 a **6 fds** de `renderD128` (composición + VAAPI), **CPU 0.1%**, journal muestra `h264 High 1920x1080` reproduciéndose. Root cause del fallo original documentado (§1.4). |
-| 4 | Revisión de seguridad del nuevo script (mismo estándar que los 13 actuales: `set -euo pipefail`, quoting, sin `eval`, `rm` acotado). | `bash -n` + el checklist de seguridad. |
+| 4 | **(HECHA)** Revisión de seguridad del nuevo script (mismo estándar que los 13 actuales: `set -euo pipefail`, quoting, sin `eval`, `rm` acotado). | ✅ `bash -n` OK; checklist aplicado (todo citado, writes con `>` acotado, sin `rm`/redes/`eval`, `systemctl --user daemon-reload` seguro). |
 | 5 | **(HECHA)** Integración: `video-add.sh` llama a `video-hwaccel.sh --apply` al añadir un clip (si el plugin está activo), y `hooks/post-update` lo re-aplica tras `omarchy update`. | ✅ Ambos hooks wired; `bash -n` OK. Auto-config idempotente. |
-| 6 | Docs (README: sección "GPU acceleration" + tabla de vendors) + commit + push. | — |
+| 6 | **(HECHA)** Docs (README: sección "GPU acceleration" + tabla de vendors) + commit + push. | ✅ README con la sección (mecanismo, tabla NVIDIA/AMD/Intel/CPU, auto-config, híbrido, control manual). |
 
 ---
 
