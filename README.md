@@ -153,7 +153,7 @@ lines; `video-bindings.sh --remove` takes them back):
 |---|---|
 | `Super+Ctrl+Space` | **Unified wallpaper switcher** — takes over the stock wallpaper key. On video themes it opens the video switcher (a carousel of your whole library with poster previews); on image themes it opens the stock background picker |
 | `Super+Ctrl+Alt+Left` / `Right` | Previous / next video (cycles the whole library, wrap-around) |
-| `Super+Ctrl+Alt+W` | **Library manager** — opens the `video-manage` TUI in a terminal window (closes when you quit) |
+| `Super+Ctrl+Alt+V` | **Library manager** — opens the `video-manage` TUI in a terminal window (closes when you quit) |
 
 ## Theme from a clip (Aether)
 
